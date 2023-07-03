@@ -50,9 +50,8 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (currentActiveClassName.isEmpty()) {
-            currentActiveClassName = activity.getComponentName().getClassName();
-        }
+        // Recover current active icon state from the operating system.
+        backfillCurrentActiveClassName(activity);
 
         String currentActiveIconName = currentActiveClassName.split("MainActivity")[1];
 
@@ -72,9 +71,8 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (currentActiveClassName.isEmpty()) {
-            currentActiveClassName = activity.getComponentName().getClassName();
-        }
+        // Recover current active icon state from the operating system.
+        backfillCurrentActiveClassName(activity);
 
         final String nextActiveClassName = packageName + ".MainActivity" + iconName;
         if (currentActiveClassName.equals(nextActiveClassName)) {
@@ -126,6 +124,12 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         classesToKill.clear();
 
         iconHasChanged = false;
+    }
+
+    private void backfillCurrentActiveClassName(Activity activity) {
+        if (currentActiveClassName.isEmpty()) {
+            currentActiveClassName = activity.getComponentName().getClassName();
+        }
     }
 
     @Override
