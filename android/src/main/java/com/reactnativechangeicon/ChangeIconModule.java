@@ -53,20 +53,20 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     @ReactMethod
-    public void changeIcon(String enableIcon, Promise promise) {
+    public void changeIcon(String iconName, Promise promise) {
         final Activity activity = getCurrentActivity();
         if (activity == null) {
             promise.reject("ACTIVITY_NOT_FOUND");
             return;
         }
-        if (enableIcon.isEmpty()) {
+        if (iconName.isEmpty()) {
             promise.reject("EMPTY_ICON_STRING");
             return;
         }
         if (this.componentClass.isEmpty()) {
             this.componentClass = activity.getComponentName().getClassName();
         }
-        final String activeClass = this.packageName + ".MainActivity" + enableIcon;
+        final String activeClass = this.packageName + ".MainActivity" + iconName;
         if (this.componentClass.equals(activeClass)) {
             promise.reject("ICON_ALREADY_USED");
             return;
@@ -77,7 +77,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP
             );
-            promise.resolve(enableIcon);
+            promise.resolve(iconName);
         } catch (Exception e) {
             promise.reject("ICON_INVALID");
             return;
