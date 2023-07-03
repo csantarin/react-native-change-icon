@@ -78,7 +78,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             );
             promise.resolve(iconName);
         } catch (Exception e) {
-            promise.reject("ICON_INVALID");
+            promise.reject("SYSTEM_ERROR");
             return;
         }
         this.classesToKill.add(this.componentClass);
