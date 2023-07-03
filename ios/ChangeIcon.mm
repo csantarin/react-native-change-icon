@@ -49,14 +49,45 @@ RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName changeIconOptions:(NS
             }
         }
 
-        [[UIApplication sharedApplication] setAlternateIconName:iconName completionHandler:^(NSError * _Nullable error) {
-            if (error) {
-              reject(@"SYSTEM_ERROR", error.localizedDescription, error);
-            } else {
-              resolve(iconName);
-            }
-        }];
+        bool skipSystemResponseDialog = changeIconOptions != nil && [[changeIconOptions valueForKey:@"skipSystemResponseDialog"] boolValue];
+        if (skipSystemResponseDialog) {
+            [self setAlternateIconName:iconName completionHandler:^(NSError * _Nullable error) {
+                if (error) {
+                  reject(@"SYSTEM_ERROR", error.localizedDescription, error);
+                } else {
+                  resolve(iconName);
+                }
+            }];
+        } else {
+            [[UIApplication sharedApplication] setAlternateIconName:iconName completionHandler:^(NSError * _Nullable error) {
+                if (error) {
+                  reject(@"SYSTEM_ERROR", error.localizedDescription, error);
+                } else {
+                  resolve(iconName);
+                }
+            }];
+        }
     });
+}
+
+// https://stackoverflow.com/a/49730130
+- (void)setAlternateIconName:(NSString *)iconName completionHandler:(nullable void (^)(NSError *_Nullable error))completionHandler {
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(supportsAlternateIcons)] &&
+        [[UIApplication sharedApplication] supportsAlternateIcons])
+    {
+        NSMutableString *selectorString = [[NSMutableString alloc] initWithCapacity:40];
+        [selectorString appendString:@"_setAlternate"];
+        [selectorString appendString:@"IconName:"];
+        [selectorString appendString:@"completionHandler:"];
+
+        SEL selector = NSSelectorFromString(selectorString);
+        IMP imp = [[UIApplication sharedApplication] methodForSelector:selector];
+        void (*func)(id, SEL, id, id) = (void (*)(id, SEL, id, id))imp;
+        if (func)
+        {
+            func([UIApplication sharedApplication], selector, iconName, completionHandler);
+        }
+    }
 }
 
 // Don't compile this code when we build for the old architecture.

@@ -6,6 +6,12 @@ declare module 'react-native-change-icon' {
      * **Platforms**: Android, iOS
      */
     skipIconAlreadyUsedCheck?: boolean;
+    /**
+     * Disable native iOS response when the icon has changed?
+     *
+     * **Platforms**: iOS
+     */
+    skipSystemResponseDialog?: boolean;
   }
 
   /**
