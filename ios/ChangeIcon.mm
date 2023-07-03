@@ -30,7 +30,7 @@ RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName resolver:(RCTPromiseR
         }
 
         if ([[UIApplication sharedApplication] supportsAlternateIcons] == NO) {
-            reject(@"NOT_SUPPORTED", @"Alternate icon not supported", error);
+            reject(@"ALTERNATE_ICON_NOT_SUPPORTED", @"Alternate icon not supported", error);
             return;
         }
 

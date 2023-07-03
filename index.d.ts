@@ -14,7 +14,7 @@ declare module 'react-native-change-icon' {
    *   - `ICON_ALREADY_USED`
    *   - `SYSTEM_ERROR`
    * - iOS
-   *   - `NOT_SUPPORTED`
+   *   - `ALTERNATE_ICON_NOT_SUPPORTED`
    *   - `EMPTY_ICON_STRING`
    *   - `ICON_ALREADY_USED`
    *   - `SYSTEM_ERROR`
