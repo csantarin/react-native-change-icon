@@ -14,11 +14,10 @@ RCT_EXPORT_MODULE()
 RCT_REMAP_METHOD(getIcon, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSString *currentIcon = [[UIApplication sharedApplication] alternateIconName];
-        if (currentIcon) {
-            resolve(currentIcon);
-        } else {
-            resolve(@"default");
-        }
+        // Return the value as is.
+        // - string: alternate app icon
+        // - nil: primary (a.k.a. default) app icon
+        resolve(currentIcon);
     });
 }
 
