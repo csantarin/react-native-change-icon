@@ -105,10 +105,14 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     private void completeIconChange() {
-        if (!iconChanged) return;
+        if (!iconChanged) {
+            return;
+        }
 
         final Activity activity = getCurrentActivity();
-        if (activity == null) return;
+        if (activity == null) {
+            return;
+        }
 
         classesToKill.forEach((cls) -> activity.getPackageManager().setComponentEnabledSetting(
             new ComponentName(this.packageName, cls),
