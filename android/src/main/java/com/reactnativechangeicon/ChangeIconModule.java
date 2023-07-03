@@ -41,7 +41,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     public void getIcon(Promise promise){
         final Activity activity = getCurrentActivity();
         if (activity == null) {
-            promise.reject("ACTIVITY_NOT_FOUND");
+            promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
             return;
         }
         if (this.componentClass.isEmpty()) {
@@ -55,11 +55,11 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     public void changeIcon(String iconName, Promise promise) {
         final Activity activity = getCurrentActivity();
         if (activity == null) {
-            promise.reject("ACTIVITY_NOT_FOUND");
+            promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
             return;
         }
         if (iconName.isEmpty()) {
-            promise.reject("EMPTY_ICON_STRING");
+            promise.reject("EMPTY_ICON_STRING", "Icon provided is empty string");
             return;
         }
         if (this.componentClass.isEmpty()) {
@@ -67,7 +67,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         }
         final String activeClass = this.packageName + ".MainActivity" + iconName;
         if (this.componentClass.equals(activeClass)) {
-            promise.reject("ICON_ALREADY_USED");
+            promise.reject("ICON_ALREADY_USED", "Icon already in use");
             return;
         }
         try {
@@ -78,7 +78,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             );
             promise.resolve(iconName);
         } catch (Exception e) {
-            promise.reject("SYSTEM_ERROR");
+            promise.reject("SYSTEM_ERROR", e.getMessage());
             return;
         }
         this.classesToKill.add(this.componentClass);
