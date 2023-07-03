@@ -217,13 +217,6 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     @Override
-    public void onActivityPaused(Activity activity) {
-        if (whenToKillPrevActiveClass.equals(CLEANUP_ON_PAUSE)) {
-            killPrevActiveClass();
-        }
-    }
-
-    @Override
     public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
     }
 
@@ -233,6 +226,13 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     @Override
     public void onActivityResumed(Activity activity) {
+    }
+
+    @Override
+    public void onActivityPaused(Activity activity) {
+        if (whenToKillPrevActiveClass.equals(CLEANUP_ON_PAUSE)) {
+            killPrevActiveClass();
+        }
     }
 
     @Override
