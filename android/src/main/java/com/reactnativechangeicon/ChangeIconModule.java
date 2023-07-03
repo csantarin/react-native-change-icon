@@ -120,8 +120,8 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             );
 
             promise.resolve(iconName);
-        } catch (Exception e) {
-            promise.reject("SYSTEM_ERROR", e.getMessage());
+        } catch (Exception exception) {
+            promise.reject("SYSTEM_ERROR", e.getMessage(), exception);
             return;
         }
 
