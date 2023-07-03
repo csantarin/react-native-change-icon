@@ -50,6 +50,12 @@ const ERROR_CODES = Object.freeze({
    */
   UNEXPECTED_COMPONENT_CLASS: "UNEXPECTED_COMPONENT_CLASS",
   /**
+   * Option `whenToKillPrevActiveClass` was not given a recognized value.
+   * 
+   * **Platforms:** Android
+   */
+  INVALID_CLEANUP_CHECKPOINT: 'INVALID_CLEANUP_CHECKPOINT',
+  /**
    * Alternate icon feature is not supported, indicating likelihood that no alternate icons was bundled.
    *
    * **Platform**: iOS

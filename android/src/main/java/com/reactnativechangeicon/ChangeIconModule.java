@@ -24,11 +24,16 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     public static final String NAME = "ChangeIcon";
     public static final String MAIN_ACTVITY_BASE_NAME = ".MainActivity";
 
+    public static final String CLEANUP_IMMEDIATELY = "immediately";
+    public static final String CLEANUP_ON_PAUSE = "onPause";
+    public static final String CLEANUP_ON_STOP = "onStop";
+
     private final String packageName;
     private final List<String> classesToKill = new ArrayList<>();
 
     private Boolean iconHasChanged = false;
     private String currentActiveClassName = "";
+    private String whenToKillPrevActiveClass = "";
 
     public ChangeIconModule(ReactApplicationContext reactContext, String packageName) {
         super(reactContext);
@@ -59,7 +64,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         // Reject the query and indicate to the developer that <activity-alias> needs setup.
         if (isActivityAlliasConfigured()) {
             String message = "Current active class name lacks a .MainActivity suffix. We cannot proceed. "
-                           + "Check that activity aliases exist and that one alias is enabled by default!";
+                    + "Check that activity aliases exist and that one alias is enabled by default!";
             promise.reject("UNEXPECTED_COMPONENT_CLASS", message);
             return;
         }
@@ -100,45 +105,85 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         // Reject the query and indicate to the developer that <activity-alias> needs setup.
         if (isActivityAlliasConfigured()) {
             String message = "Current active class name lacks a .MainActivity suffix. We cannot proceed. "
-                           + "Check that activity aliases exist and that one alias is enabled by default!";
+                    + "Check that activity aliases exist and that one alias is enabled by default!";
             promise.reject("UNEXPECTED_COMPONENT_CLASS", message);
             return;
         }
 
+        // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
+        final String nextActiveClassName = packageName + MAIN_ACTVITY_BASE_NAME + iconName;
+
         boolean skipIconAlreadyUsedCheck = changeIconOptions != null && changeIconOptions.getBoolean("skipIconAlreadyUsedCheck");
         if (skipIconAlreadyUsedCheck) {
-            // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
-            final String nextActiveClassName = packageName + MAIN_ACTVITY_BASE_NAME + iconName;
             if (currentActiveClassName.equals(nextActiveClassName)) {
                 promise.reject("ICON_ALREADY_USED", "Icon already in use");
                 return;
             }
         }
 
-        try {
-            activity.getPackageManager().setComponentEnabledSetting(
-                new ComponentName(packageName, nextActiveClassName),
-                PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                PackageManager.DONT_KILL_APP
-            );
+        whenToKillPrevActiveClass = changeIconOptions == null
+                ? CLEANUP_IMMEDIATELY
+                : changeIconOptions.getString("whenToKillPrevActiveClass");
+        whenToKillPrevActiveClass = whenToKillPrevActiveClass == null
+                ? CLEANUP_IMMEDIATELY
+                : whenToKillPrevActiveClass;
 
-            promise.resolve(iconName);
-        } catch (Exception exception) {
-            promise.reject("SYSTEM_ERROR", e.getMessage(), exception);
-            return;
+        switch (whenToKillPrevActiveClass) {
+            case CLEANUP_IMMEDIATELY:
+                try {
+                    activity.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(packageName, currentActiveClassName),
+                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                            PackageManager.DONT_KILL_APP
+                    );
+                    activity.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(packageName, nextActiveClassName),
+                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                            PackageManager.DONT_KILL_APP
+                    );
+
+                    whenToKillPrevActiveClass = "";
+
+                    promise.resolve(iconName);
+                } catch (Exception exception) {
+                    promise.reject("SYSTEM_ERROR", e.getMessage(), exception);
+                    return;
+                }
+                break;
+
+            case CLEANUP_ON_PAUSE:
+            case CLEANUP_ON_STOP:
+                try {
+                    activity.getPackageManager().setComponentEnabledSetting(
+                            new ComponentName(packageName, nextActiveClassName),
+                            PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                            PackageManager.DONT_KILL_APP
+                    );
+
+                    promise.resolve(iconName);
+                } catch (Exception exception) {
+                    promise.reject("SYSTEM_ERROR", e.getMessage(), exception);
+                    return;
+                }
+
+                // Queue current active class for cleanup.
+                classesToKill.add(currentActiveClassName);
+
+                currentActiveClassName = nextActiveClassName;
+
+                activity.getApplication().registerActivityLifecycleCallbacks(this);
+
+                iconHasChanged = true;
+                break;
+
+            default:
+                promise.reject("INVALID_CLEANUP_CHECKPOINT", "Cannot set whenToKillPrevActiveClass to unrecognized checkpoint: " + whenToKillPrevActiveClass);
         }
-
-        // Queue current active class for cleanup.
-        classesToKill.add(currentActiveClassName);
-
-        currentActiveClassName = nextActiveClassName;
-
-        activity.getApplication().registerActivityLifecycleCallbacks(this);
-
-        iconHasChanged = true;
     }
 
     private void killPrevActiveClass() {
+        whenToKillPrevActiveClass = "";
+
         if (!iconHasChanged) {
             return;
         }
@@ -173,7 +218,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     @Override
     public void onActivityPaused(Activity activity) {
-        killPrevActiveClass();
+        if (whenToKillPrevActiveClass.equals(CLEANUP_ON_PAUSE)) {
+            killPrevActiveClass();
+        }
     }
 
     @Override
@@ -190,6 +237,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     @Override
     public void onActivityStopped(Activity activity) {
+        if (whenToKillPrevActiveClass.equals(CLEANUP_ON_STOP)) {
+            killPrevActiveClass();
+        }
     }
 
     @Override
