@@ -21,6 +21,7 @@ import java.util.List;
 @ReactModule(name = ChangeIconModule.NAME)
 public class ChangeIconModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks {
     public static final String NAME = "ChangeIcon";
+    public static final String MAIN_ACTVITY_BASE_NAME = ".MainActivity";
 
     private final String packageName;
 
@@ -67,7 +68,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         // Current active class name is "com.example.MainActivityDefault".
         // "com.example.MainActivityDefault" => ["com.example", "Default"]
         // Select suffix; "Default" in this case, then return it.
-        String[] parts = currentActiveClassName.split(".MainActivity");
+        String[] parts = currentActiveClassName.split(MAIN_ACTVITY_BASE_NAME);
         String currentActiveIconName = parts[1];
 
         promise.resolve(currentActiveIconName);
@@ -106,7 +107,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         }
 
         // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
-        final String nextActiveClassName = packageName + ".MainActivity" + iconName;
+        final String nextActiveClassName = packageName + MAIN_ACTVITY_BASE_NAME + iconName;
         if (currentActiveClassName.equals(nextActiveClassName)) {
             promise.reject("ICON_ALREADY_USED", "Icon already in use");
             return;
@@ -165,7 +166,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     private boolean isActivityAlliasConfigured() {
-        return currentActiveClassName.endsWith(".MainActivity");
+        return currentActiveClassName.endsWith(MAIN_ACTVITY_BASE_NAME);
     }
 
     @Override
