@@ -53,9 +53,24 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         // Recover current active icon state from the operating system.
         backfillCurrentActiveClassName(activity);
 
-        String currentActiveIconName = currentActiveClassName.split("MainActivity")[1];
+        // Current active class name is "com.example.MainActivity".
+        // It is likely that <activity-alias> entries have not been added yet.
+        // We cannot proceed to split this as per next step or else the app will crash natively.
+        // Reject the query and indicate to the developer that <activity-alias> needs setup.
+        if (isActivityAlliasConfigured()) {
+            String message = "Current active class name lacks a .MainActivity suffix. We cannot proceed. "
+                           + "Check that activity aliases exist and that one alias is enabled by default!";
+            promise.reject("UNEXPECTED_COMPONENT_CLASS", message);
+            return;
+        }
 
-        promise.resolve(currentActiveIconName.isEmpty() ? null : currentActiveIconName);
+        // Current active class name is "com.example.MainActivityDefault".
+        // "com.example.MainActivityDefault" => ["com.example", "Default"]
+        // Select suffix; "Default" in this case, then return it.
+        String[] parts = currentActiveClassName.split(".MainActivity");
+        String currentActiveIconName = parts[1];
+
+        promise.resolve(currentActiveIconName);
     }
 
     @ReactMethod
@@ -73,6 +88,17 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
         // Recover current active icon state from the operating system.
         backfillCurrentActiveClassName(activity);
+
+        // Current active class name is "com.example.MainActivity".
+        // It is likely that <activity-alias> entries have not been added yet.
+        // We cannot proceed to change icons because there is likely no alias yet or else the app will crash natively.
+        // Reject the query and indicate to the developer that <activity-alias> needs setup.
+        if (isActivityAlliasConfigured()) {
+            String message = "Current active class name lacks a .MainActivity suffix. We cannot proceed. "
+                           + "Check that activity aliases exist and that one alias is enabled by default!";
+            promise.reject("UNEXPECTED_COMPONENT_CLASS", message);
+            return;
+        }
 
         final String nextActiveClassName = packageName + ".MainActivity" + iconName;
         if (currentActiveClassName.equals(nextActiveClassName)) {
@@ -130,6 +156,10 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         if (currentActiveClassName.isEmpty()) {
             currentActiveClassName = activity.getComponentName().getClassName();
         }
+    }
+
+    private boolean isActivityAlliasConfigured() {
+        return currentActiveClassName.endsWith(".MainActivity");
     }
 
     @Override

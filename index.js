@@ -10,8 +10,7 @@ import { NativeModules } from "react-native";
 const changeIcon = (iconName) => NativeModules.ChangeIcon.changeIcon(iconName).then((result) => result ?? null);
 
 /**
- * Returns the current icon name or `null` if using primary icon on iOS or if icon name is empty
- * inexplicably on Android.
+ * Returns the current icon name or `null` if using primary icon on iOS.
  * @returns {Promise<string | null>} Name of the currently active icon.
  */
 const getIcon = () => NativeModules.ChangeIcon.getIcon();

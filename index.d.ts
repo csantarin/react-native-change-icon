@@ -9,8 +9,7 @@ declare module 'react-native-change-icon' {
   const changeIcon: (iconName: string | null) => Promise<string | null>;
 
   /**
-   * Returns the current icon name or `null` if using primary icon on iOS or if icon name is empty
-   * inexplicably on Android.
+   * Returns the current icon name or `null` if using primary icon on iOS.
    * @returns Name of the currently active icon.
    */
   const getIcon: () => Promise<string | null>;
