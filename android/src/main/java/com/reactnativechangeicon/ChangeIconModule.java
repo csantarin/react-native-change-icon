@@ -21,13 +21,18 @@ import java.util.List;
 @ReactModule(name = ChangeIconModule.NAME)
 public class ChangeIconModule extends ReactContextBaseJavaModule implements Application.ActivityLifecycleCallbacks {
     public static final String NAME = "ChangeIcon";
+
     private final String packageName;
+
     private List<String> classesToKill = new ArrayList<>();
+
     private Boolean iconChanged = false;
+
     private String componentClass = "";
 
     public ChangeIconModule(ReactApplicationContext reactContext, String packageName) {
         super(reactContext);
+
         this.packageName = packageName;
     }
 
@@ -44,10 +49,13 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
             return;
         }
+
         if (this.componentClass.isEmpty()) {
             this.componentClass = activity.getComponentName().getClassName();
         }
+
         String currentIcon = this.componentClass.split("MainActivity")[1];
+
         promise.resolve(currentIcon.isEmpty() ? null : currentIcon);
     }
 
@@ -58,45 +66,58 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
             return;
         }
+
         if (iconName.isEmpty()) {
             promise.reject("EMPTY_ICON_STRING", "Icon provided is empty string");
             return;
         }
+
         if (this.componentClass.isEmpty()) {
             this.componentClass = activity.getComponentName().getClassName();
         }
+
         final String activeClass = this.packageName + ".MainActivity" + iconName;
         if (this.componentClass.equals(activeClass)) {
             promise.reject("ICON_ALREADY_USED", "Icon already in use");
             return;
         }
+
         try {
             activity.getPackageManager().setComponentEnabledSetting(
                 new ComponentName(this.packageName, activeClass),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP
             );
+
             promise.resolve(iconName);
         } catch (Exception e) {
             promise.reject("SYSTEM_ERROR", e.getMessage());
             return;
         }
+
         this.classesToKill.add(this.componentClass);
+
         this.componentClass = activeClass;
+
         activity.getApplication().registerActivityLifecycleCallbacks(this);
+
         iconChanged = true;
     }
 
     private void completeIconChange() {
         if (!iconChanged) return;
+
         final Activity activity = getCurrentActivity();
         if (activity == null) return;
+
         classesToKill.forEach((cls) -> activity.getPackageManager().setComponentEnabledSetting(
             new ComponentName(this.packageName, cls),
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             PackageManager.DONT_KILL_APP
         ));
+
         classesToKill.clear();
+
         iconChanged = false;
     }
 
