@@ -75,14 +75,14 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     @ReactMethod
     public void changeIcon(String iconName, Promise promise) {
-        final Activity activity = getCurrentActivity();
-        if (activity == null) {
-            promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
+        if (iconName.isEmpty()) {
+            promise.reject("EMPTY_ICON_STRING", "Icon provided is empty string");
             return;
         }
 
-        if (iconName.isEmpty()) {
-            promise.reject("EMPTY_ICON_STRING", "Icon provided is empty string");
+        final Activity activity = getCurrentActivity();
+        if (activity == null) {
+            promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
             return;
         }
 
