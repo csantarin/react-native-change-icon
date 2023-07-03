@@ -25,6 +25,10 @@ RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName resolver:(RCTPromiseR
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
 
+        if (iconName != nil && [iconName length] == 0) {
+            reject(@"EMPTY_ICON_STRING", @"Icon provided is empty string", error);
+        }
+
         if ([[UIApplication sharedApplication] supportsAlternateIcons] == NO) {
             reject(@"NOT_SUPPORTED", @"Alternate icon not supported", error);
             return;
