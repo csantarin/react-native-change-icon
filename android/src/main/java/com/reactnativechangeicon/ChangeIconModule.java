@@ -24,11 +24,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     public static final String MAIN_ACTVITY_BASE_NAME = ".MainActivity";
 
     private final String packageName;
-
     private final List<String> classesToKill = new ArrayList<>();
 
     private Boolean iconHasChanged = false;
-
     private String currentActiveClassName = "";
 
     public ChangeIconModule(ReactApplicationContext reactContext, String packageName) {
