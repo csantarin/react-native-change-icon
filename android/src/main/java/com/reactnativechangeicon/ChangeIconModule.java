@@ -43,7 +43,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     @ReactMethod
-    public void getIcon(Promise promise){
+    public void getIcon(Promise promise) {
         final Activity activity = getCurrentActivity();
         if (activity == null) {
             promise.reject("ACTIVITY_NOT_FOUND", "Activity was not found");
