@@ -75,6 +75,11 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     @ReactMethod
     public void changeIcon(String iconName, Promise promise) {
+        if (iconName == null) {
+            promise.reject("NULL_ICON_STRING", "Icon provided is null");
+            return;
+        }
+
         if (iconName.isEmpty()) {
             promise.reject("EMPTY_ICON_STRING", "Icon provided is empty string");
             return;
@@ -100,6 +105,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
+        // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
         final String nextActiveClassName = packageName + ".MainActivity" + iconName;
         if (currentActiveClassName.equals(nextActiveClassName)) {
             promise.reject("ICON_ALREADY_USED", "Icon already in use");
