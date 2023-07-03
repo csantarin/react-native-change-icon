@@ -26,9 +26,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     private List<String> classesToKill = new ArrayList<>();
 
-    private Boolean iconChanged = false;
+    private Boolean iconHasChanged = false;
 
-    private String componentClass = "";
+    private String currentActiveClassName = "";
 
     public ChangeIconModule(ReactApplicationContext reactContext, String packageName) {
         super(reactContext);
@@ -50,13 +50,13 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (componentClass.isEmpty()) {
-            componentClass = activity.getComponentName().getClassName();
+        if (currentActiveClassName.isEmpty()) {
+            currentActiveClassName = activity.getComponentName().getClassName();
         }
 
-        String currentIcon = componentClass.split("MainActivity")[1];
+        String currentActiveIconName = currentActiveClassName.split("MainActivity")[1];
 
-        promise.resolve(currentIcon.isEmpty() ? null : currentIcon);
+        promise.resolve(currentActiveIconName.isEmpty() ? null : currentActiveIconName);
     }
 
     @ReactMethod
@@ -72,19 +72,19 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (componentClass.isEmpty()) {
-            componentClass = activity.getComponentName().getClassName();
+        if (currentActiveClassName.isEmpty()) {
+            currentActiveClassName = activity.getComponentName().getClassName();
         }
 
-        final String activeClass = packageName + ".MainActivity" + iconName;
-        if (componentClass.equals(activeClass)) {
+        final String nextActiveClassName = packageName + ".MainActivity" + iconName;
+        if (currentActiveClassName.equals(nextActiveClassName)) {
             promise.reject("ICON_ALREADY_USED", "Icon already in use");
             return;
         }
 
         try {
             activity.getPackageManager().setComponentEnabledSetting(
-                new ComponentName(packageName, activeClass),
+                new ComponentName(packageName, nextActiveClassName),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP
             );
@@ -95,17 +95,18 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        classesToKill.add(componentClass);
+        // Queue current active class for cleanup.
+        classesToKill.add(currentActiveClassName);
 
-        componentClass = activeClass;
+        currentActiveClassName = nextActiveClassName;
 
         activity.getApplication().registerActivityLifecycleCallbacks(this);
 
-        iconChanged = true;
+        iconHasChanged = true;
     }
 
-    private void completeIconChange() {
-        if (!iconChanged) {
+    private void killPrevActiveClass() {
+        if (!iconHasChanged) {
             return;
         }
 
@@ -114,9 +115,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        for (String cls : classesToKill) {
+        for (String prevActiveClassName : classesToKill) {
             activity.getPackageManager().setComponentEnabledSetting(
-                    new ComponentName(packageName, cls),
+                    new ComponentName(packageName, prevActiveClassName),
                     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                     PackageManager.DONT_KILL_APP
             );
@@ -124,12 +125,12 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
         classesToKill.clear();
 
-        iconChanged = false;
+        iconHasChanged = false;
     }
 
     @Override
     public void onActivityPaused(Activity activity) {
-        completeIconChange();
+        killPrevActiveClass();
     }
 
     @Override
