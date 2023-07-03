@@ -25,7 +25,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
 
     private final String packageName;
 
-    private List<String> classesToKill = new ArrayList<>();
+    private final List<String> classesToKill = new ArrayList<>();
 
     private Boolean iconHasChanged = false;
 
