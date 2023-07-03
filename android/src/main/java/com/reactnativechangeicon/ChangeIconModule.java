@@ -50,11 +50,11 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (this.componentClass.isEmpty()) {
-            this.componentClass = activity.getComponentName().getClassName();
+        if (componentClass.isEmpty()) {
+            componentClass = activity.getComponentName().getClassName();
         }
 
-        String currentIcon = this.componentClass.split("MainActivity")[1];
+        String currentIcon = componentClass.split("MainActivity")[1];
 
         promise.resolve(currentIcon.isEmpty() ? null : currentIcon);
     }
@@ -72,19 +72,19 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        if (this.componentClass.isEmpty()) {
-            this.componentClass = activity.getComponentName().getClassName();
+        if (componentClass.isEmpty()) {
+            componentClass = activity.getComponentName().getClassName();
         }
 
-        final String activeClass = this.packageName + ".MainActivity" + iconName;
-        if (this.componentClass.equals(activeClass)) {
+        final String activeClass = packageName + ".MainActivity" + iconName;
+        if (componentClass.equals(activeClass)) {
             promise.reject("ICON_ALREADY_USED", "Icon already in use");
             return;
         }
 
         try {
             activity.getPackageManager().setComponentEnabledSetting(
-                new ComponentName(this.packageName, activeClass),
+                new ComponentName(packageName, activeClass),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
                 PackageManager.DONT_KILL_APP
             );
@@ -95,9 +95,9 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        this.classesToKill.add(this.componentClass);
+        classesToKill.add(componentClass);
 
-        this.componentClass = activeClass;
+        componentClass = activeClass;
 
         activity.getApplication().registerActivityLifecycleCallbacks(this);
 
@@ -115,7 +115,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
         }
 
         classesToKill.forEach((cls) -> activity.getPackageManager().setComponentEnabledSetting(
-            new ComponentName(this.packageName, cls),
+            new ComponentName(packageName, cls),
             PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             PackageManager.DONT_KILL_APP
         ));
