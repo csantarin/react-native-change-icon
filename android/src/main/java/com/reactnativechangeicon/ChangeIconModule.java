@@ -114,11 +114,13 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        classesToKill.forEach((cls) -> activity.getPackageManager().setComponentEnabledSetting(
-            new ComponentName(packageName, cls),
-            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-            PackageManager.DONT_KILL_APP
-        ));
+        for (String cls : classesToKill) {
+            activity.getPackageManager().setComponentEnabledSetting(
+                    new ComponentName(packageName, cls),
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP
+            );
+        }
 
         classesToKill.clear();
 
