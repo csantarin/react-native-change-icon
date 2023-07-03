@@ -38,6 +38,7 @@ RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName changeIconOptions:(NS
 
         bool skipIconAlreadyUsedCheck = changeIconOptions != nil && [[changeIconOptions valueForKey:@"skipIconAlreadyUsedCheck"] boolValue];
         if (skipIconAlreadyUsedCheck) {
+        } else {
             if (currentIcon == nil && iconName == nil) {
                 reject(@"ICON_ALREADY_USED", @"Icon already in use", error);
                 return;
