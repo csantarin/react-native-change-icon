@@ -1,9 +1,19 @@
 declare module 'react-native-change-icon' {
+  interface ChangeIconOptions {
+    /**
+     * Allow passing of `iconName` when it is identical to currently active `iconName`?
+     *
+     * **Platforms**: Android, iOS
+     */
+    skipIconAlreadyUsedCheck?: boolean;
+  }
+
   /**
    * Swaps the currently active app icon for another one. The name provided must map to an icon that
    * exists as an asset in the app bundle in order for this method to work. Icons downloaded off the
    * cloud will not be applicable here.
    * @param iconName Name of the icon to change to. `null` for primary icon on iOS.
+   * @param changeIconOptions Additional options to alter the method behavior.
    * @returns Name of the icon to change to. `null` for primary icon on iOS.
    * @throws
    * - Android
@@ -19,7 +29,7 @@ declare module 'react-native-change-icon' {
    *   - `ICON_ALREADY_USED`
    *   - `SYSTEM_ERROR`
    */
-  const changeIcon: (iconName: string | null) => Promise<string | null>;
+  const changeIcon: (iconName: string | null, changeIconOptions?: ChangeIconOptions) => Promise<string | null>;
 
   /**
    * Returns the current icon name or `null` if using primary icon on iOS.

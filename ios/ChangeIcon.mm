@@ -21,7 +21,7 @@ RCT_REMAP_METHOD(getIcon, resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCT
     });
 }
 
-RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
+RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName changeIconOptions:(NSDictionary *)changeIconOptions resolver:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
     dispatch_async(dispatch_get_main_queue(), ^{
         NSError *error = nil;
 
@@ -36,9 +36,17 @@ RCT_REMAP_METHOD(changeIcon, iconName:(NSString *)iconName resolver:(RCTPromiseR
 
         NSString *currentIcon = [[UIApplication sharedApplication] alternateIconName];
 
-        if ([iconName isEqualToString:currentIcon]) {
-            reject(@"ICON_ALREADY_USED", @"Icon already in use", error);
-            return;
+        bool skipIconAlreadyUsedCheck = changeIconOptions != nil && [[changeIconOptions valueForKey:@"skipIconAlreadyUsedCheck"] boolValue];
+        if (skipIconAlreadyUsedCheck) {
+            if (currentIcon == nil && iconName == nil) {
+                reject(@"ICON_ALREADY_USED", @"Icon already in use", error);
+                return;
+            }
+            
+            if ([iconName isEqualToString:currentIcon]) {
+                reject(@"ICON_ALREADY_USED", @"Icon already in use", error);
+                return;
+            }
         }
 
         [[UIApplication sharedApplication] setAlternateIconName:iconName completionHandler:^(NSError * _Nullable error) {

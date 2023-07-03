@@ -5,6 +5,7 @@ import { NativeModules } from "react-native";
  * exists as an asset in the app bundle in order for this method to work. Icons downloaded off the
  * cloud will not be applicable here.
  * @param {string | null} iconName Name of the icon to change to. `null` for primary icon on iOS.
+ * @param {import('react-native-change-icon').ChangeIconOptions} changeIconOptions Additional options to alter the method behavior.
  * @returns {Promise<string | null>} Name of the icon to change to. `null` for primary icon on iOS.
  * @throws
  * - Android
@@ -20,7 +21,7 @@ import { NativeModules } from "react-native";
  *   - `ICON_ALREADY_USED`
  *   - `SYSTEM_ERROR`
  */
-const changeIcon = (iconName) => NativeModules.ChangeIcon.changeIcon(iconName).then((result) => result ?? null);
+const changeIcon = (iconName, changeIconOptions) => NativeModules.ChangeIcon.changeIcon(iconName, changeIconOptions).then((result) => result ?? null);
 
 /**
  * Returns the current icon name or `null` if using primary icon on iOS.

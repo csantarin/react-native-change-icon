@@ -12,6 +12,7 @@ import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.module.annotations.ReactModule;
 
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
     }
 
     @ReactMethod
-    public void changeIcon(String iconName, Promise promise) {
+    public void changeIcon(String iconName, ReadableMap changeIconOptions, Promise promise) {
         if (iconName == null) {
             promise.reject("NULL_ICON_STRING", "Icon provided is null");
             return;
@@ -104,11 +105,14 @@ public class ChangeIconModule extends ReactContextBaseJavaModule implements Appl
             return;
         }
 
-        // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
-        final String nextActiveClassName = packageName + MAIN_ACTVITY_BASE_NAME + iconName;
-        if (currentActiveClassName.equals(nextActiveClassName)) {
-            promise.reject("ICON_ALREADY_USED", "Icon already in use");
-            return;
+        boolean skipIconAlreadyUsedCheck = changeIconOptions != null && changeIconOptions.getBoolean("skipIconAlreadyUsedCheck");
+        if (skipIconAlreadyUsedCheck) {
+            // Construct next active class name: "com.example" + ".MainActivity" + "RedIcon" = "com.example.MainActivityRedIcon"
+            final String nextActiveClassName = packageName + MAIN_ACTVITY_BASE_NAME + iconName;
+            if (currentActiveClassName.equals(nextActiveClassName)) {
+                promise.reject("ICON_ALREADY_USED", "Icon already in use");
+                return;
+            }
         }
 
         try {
