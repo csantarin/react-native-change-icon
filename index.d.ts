@@ -23,6 +23,18 @@ declare module 'react-native-change-icon' {
     whenToKillPrevActiveClass?: 'immediately' | 'onPause' | 'onStop'
   }
 
+  interface ChangeIconError extends Error {
+    code?: typeof ERROR_CODES[keyof Pick<typeof ERROR_CODES,
+      | 'ACTIVITY_NOT_FOUND'
+      | 'UNEXPECTED_COMPONENT_CLASS'
+      | 'NULL_ICON_STRING'
+      | 'ALTERNATE_ICON_NOT_SUPPORTED'
+      | 'EMPTY_ICON_STRING'
+      | 'ICON_ALREADY_USED'
+      | 'SYSTEM_ERROR'
+    >];
+  }
+
   /**
    * Swaps the currently active app icon for another one. The name provided must map to an icon that
    * exists as an asset in the app bundle in order for this method to work. Icons downloaded off the
@@ -45,6 +57,13 @@ declare module 'react-native-change-icon' {
    *   - `SYSTEM_ERROR`
    */
   const changeIcon: (iconName: string | null, changeIconOptions?: ChangeIconOptions) => Promise<string | null>;
+
+  interface GetIconError extends Error {
+    code?: typeof ERROR_CODES[keyof Pick<typeof ERROR_CODES,
+      | 'ACTIVITY_NOT_FOUND'
+      | 'UNEXPECTED_COMPONENT_CLASS'
+    >];
+  }
 
   /**
    * Returns the current icon name or `null` if using primary icon on iOS.
