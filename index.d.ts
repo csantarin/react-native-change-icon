@@ -42,7 +42,8 @@ declare module 'react-native-change-icon' {
    * @param iconName Name of the icon to change to. `null` for primary icon on iOS.
    * @param changeIconOptions Additional options to alter the method behavior.
    * @returns Name of the icon to change to. `null` for primary icon on iOS.
-   * @throws
+   * @throws Error with one of the following codes.
+   * @error_codes
    * - Android
    *   - `ACTIVITY_NOT_FOUND`
    *   - `UNEXPECTED_COMPONENT_CLASS`
@@ -68,7 +69,8 @@ declare module 'react-native-change-icon' {
   /**
    * Returns the current icon name or `null` if using primary icon on iOS.
    * @returns Name of the currently active icon.
-   * @throws
+   * @throws Error with one of the following codes.
+   * @error_codes
    * - Android
    *   - `ACTIVITY_NOT_FOUND`
    *   - `UNEXPECTED_COMPONENT_CLASS`

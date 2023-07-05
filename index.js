@@ -7,7 +7,8 @@ import { NativeModules } from "react-native";
  * @param {string | null} iconName Name of the icon to change to. `null` for primary icon on iOS.
  * @param {import('react-native-change-icon').ChangeIconOptions} changeIconOptions Additional options to alter the method behavior.
  * @returns {Promise<string | null>} Name of the icon to change to. `null` for primary icon on iOS.
- * @throws
+ * @throws Error with one of the following codes.
+ * @error_codes
  * - Android
  *   - `ACTIVITY_NOT_FOUND`
  *   - `UNEXPECTED_COMPONENT_CLASS`
@@ -26,7 +27,8 @@ const changeIcon = (iconName, changeIconOptions) => NativeModules.ChangeIcon.cha
 /**
  * Returns the current icon name or `null` if using primary icon on iOS.
  * @returns {Promise<string | null>} Name of the currently active icon.
- * @throws
+ * @throws Error with one of the following codes.
+ * @error_codes
  * - Android
  *   - `ACTIVITY_NOT_FOUND`
  *   - `UNEXPECTED_COMPONENT_CLASS`
